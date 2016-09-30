@@ -1,0 +1,3 @@
+---
+  - include: _certificates.yml
+  - include: _kubernetes_components.yml

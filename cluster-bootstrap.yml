@@ -1,0 +1,52 @@
+---
+# Setup ssh-keys, security_groups, anti_affinity_groups and start VMs
+- hosts: localhost
+  connection: local
+  vars:
+    - num_worker_nodes: "{{ initial_num_worker_nodes }}"
+    - desired_num_worker_nodes: "{{ initial_num_worker_nodes }}"
+  roles:
+    - common
+    - infra-master
+    - infra-worker
+
+# Bootstrap ansible for CoreOS
+- hosts: master_nodes, worker_nodes
+  gather_facts: False
+  roles:
+    - defunctzombie.coreos-bootstrap
+
+# Gather facts on all nodes
+- hosts: all
+  tasks: []
+
+# Generate certificates
+- hosts: localhost
+  connection: local
+  roles:
+    - certificates
+
+# Deploy kubernetes components for master nodes
+- hosts: master_nodes
+  become: true
+  roles:
+    - kubernetes-master
+
+# Deploy kubernetes components for worker nodes
+- hosts: worker_nodes
+  become: true
+  roles:
+    - kubernetes-worker
+
+# Write inventory
+- hosts: localhost
+  connection: local
+  roles:
+    - infra-inventory
+
+# Setup kubectl and deploy sky-dns
+- hosts: localhost
+  connection: local
+  roles:
+    - kubectl
+    - kube-dns

@@ -1,0 +1,22 @@
+# common variables
+cluster_name: k8s
+cluster_zone: CH-DK-2
+ssh_key: "{{ cluster_name }}-key"
+anti_affinity_group_name: "{{ cluster_name }}-aag"
+
+# master node variables
+master_security_group_name: "{{ cluster_name }}-master-sg"
+master_instance_size: Tiny
+
+# worker node variables
+initial_num_worker_nodes: 3
+worker_security_group_name: "{{ cluster_name }}-worker-sg"
+worker_instance_size: Small
+
+# kubernetes variables
+k8s_version: "v1.3.7_coreos.0"
+cluster_dns: "10.100.0.10"
+service_cluster_ip_range: "10.100.0.0/16"
+
+# certificate variables
+cfssl_version: "R1.2"

@@ -1,0 +1,17 @@
+[Service]
+Environment=KUBELET_VERSION={{ k8s_version }}
+ExecStart=/usr/lib/coreos/kubelet-wrapper \
+  --api-servers=https://127.0.0.1 \
+  --register-schedulable=false \
+  --allow-privileged=true \
+  --config=/etc/kubernetes/manifests \
+  --hostname-override={{ ansible_default_ipv4.address }} \
+  --cluster-dns={{ cluster_dns }} \
+  --cluster-domain=cluster.local \
+  --kubeconfig=/etc/kubernetes/kube_config.yaml \
+  --tls-cert-file=/etc/kubernetes/ssl/apiserver-client.pem \
+  --tls-private-key-file=/etc/kubernetes/ssl/apiserver-client-key.pem
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=multi-user.target

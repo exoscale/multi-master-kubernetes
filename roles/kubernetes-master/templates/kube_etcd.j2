@@ -1,0 +1,71 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: etcd-server
+  namespace: kube-system
+spec:
+  containers:
+    -
+      command:
+        - /bin/sh
+        - "-c"
+        - "/usr/local/bin/etcd \
+           --name {{ ansible_hostname }} \
+           --initial-cluster {{ cluster_name }}-master-1=https://{{ master1_ip }}:12380,{{ cluster_name }}-master-2=https://{{ master2_ip }}:12380,{{ cluster_name }}-master-3=https://{{ master3_ip }}:12380 \
+           --initial-advertise-peer-urls https://{{ ansible_default_ipv4.address }}:12380 \
+           --listen-peer-urls https://127.0.0.1:12380,https://{{ ansible_default_ipv4.address }}:12380 \
+           --advertise-client-urls https://{{ ansible_default_ipv4.address }}:12379 \
+           --listen-client-urls https://127.0.0.1:12379,https://{{ ansible_default_ipv4.address }}:12379 \
+           --cert-file /etc/ssl/kubernetes-etcd/etcd.pem \
+           --key-file /etc/ssl/kubernetes-etcd/etcd-key.pem \
+           --trusted-ca-file /etc/ssl/kubernetes-etcd/ca.pem \
+           --client-cert-auth --peer-cert-file /etc/ssl/kubernetes-etcd/etcd.pem \
+           --peer-key-file /etc/ssl/kubernetes-etcd/etcd-key.pem \
+           --peer-trusted-ca-file /etc/ssl/kubernetes-etcd/ca.pem \
+           --peer-client-cert-auth \
+           --data-dir /var/etcd/data-{{ ansible_hostname }}"
+      image: "gcr.io/google_containers/etcd:2.2.1"
+      livenessProbe:
+        tcpSocket:
+          host: "127.0.0.1"
+          port: 12379
+        initialDelaySeconds: 15
+        timeoutSeconds: 15
+      name: etcd-container
+      ports:
+        -
+          containerPort: 12380
+          hostPort: 12380
+          name: serverport
+        -
+          containerPort: 12379
+          hostPort: 12379
+          name: clientport
+      volumeMounts:
+        -
+          mountPath: /var/etcd
+          name: varetcd
+          readOnly: false
+        -
+          mountPath: "/var/log/kube-etcd.log"
+          name: varlogetcd
+          readOnly: false
+        -
+          mountPath: /etc/ssl/kubernetes-etcd
+          name: etcsslkubernetesetcd
+          readOnly: true
+  hostNetwork: true
+  volumes:
+    -
+      hostPath:
+        path: /mnt/master-pd/var/etcd
+      name: varetcd
+    -
+      hostPath:
+        path: "/var/log/kube-etcd.log"
+      name: varlogetcd
+    -
+      hostPath:
+        path: /etc/ssl/kubernetes-etcd
+      name: etcsslkubernetesetcd

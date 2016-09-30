@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-apiserver
+  namespace: kube-system
+spec:
+  containers:
+    -
+      command:
+        - /hyperkube
+        - apiserver
+        - "--bind-address=0.0.0.0"
+        - "--etcd-servers=https://127.0.0.1:12379"
+        - "--etcd-cafile=/etc/kubernetes/ssl/etcd-ca.pem"
+        - "--etcd-certfile=/etc/kubernetes/ssl/etcd-client.pem"
+        - "--etcd-keyfile=/etc/kubernetes/ssl/etcd-client-key.pem"
+        - "--allow-privileged=true"
+        - "--service-cluster-ip-range={{ service_cluster_ip_range }}"
+        - "--secure-port=443"
+        - "--advertise-address={{ ansible_default_ipv4.address }}"
+        - "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota"
+        - "--client-ca-file=/etc/kubernetes/ssl/apiserver-ca.pem"
+        - "--tls-cert-file=/etc/kubernetes/ssl/apiserver.pem"
+        - "--tls-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem"
+        - "--service-account-key-file=/etc/kubernetes/ssl/service-account-key.pem"
+        - "--runtime-config=extensions/v1beta1=true"
+      image: "quay.io/coreos/hyperkube:{{ k8s_version }}"
+      name: kube-apiserver
+      ports:
+        -
+          containerPort: 443
+          hostPort: 443
+          name: https
+        -
+          containerPort: 8080
+          hostPort: 8080
+          name: local
+      volumeMounts:
+        -
+          mountPath: /etc/kubernetes/ssl
+          name: ssl-certs-kubernetes
+          readOnly: true
+        -
+          mountPath: /etc/ssl/certs
+          name: ssl-certs-host
+          readOnly: true
+  hostNetwork: true
+  volumes:
+    -
+      hostPath:
+        path: /etc/kubernetes/ssl
+      name: ssl-certs-kubernetes
+    -
+      hostPath:
+        path: /usr/share/ca-certificates
+      name: ssl-certs-host

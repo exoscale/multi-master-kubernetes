@@ -1,0 +1,4 @@
+---
+  - include: _setup.yml
+  - include: _generate_cas.yml
+  - include: _generate_certificates.yml

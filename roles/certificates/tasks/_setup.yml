@@ -1,0 +1,31 @@
+- file:
+    path: ssl
+    state: directory
+    mode: 0770
+
+- file:
+    path: ssl/bin
+    state: directory
+    mode: 0770
+
+- name: download cfssl
+  get_url:
+    url: https://pkg.cfssl.org/{{ cfssl_version }}/cfssl_linux-amd64
+    dest: ssl/bin/cfssl
+    mode: 0755
+
+- name: download cfssljson
+  get_url:
+    url: https://pkg.cfssl.org/{{ cfssl_version }}/cfssljson_linux-amd64
+    dest: ssl/bin/cfssljson
+    mode: 0755
+
+- file:
+    path: ssl/infra
+    state: directory
+    mode: 0770
+
+- file:
+    path: ssl/kubernetes
+    state: directory
+    mode: 0770

@@ -1,0 +1,54 @@
+- set_fact:
+     master1_ip: "{{ hostvars[groups['master_nodes'][0]]['ansible_host'] }}"
+     master2_ip: "{{ hostvars[groups['master_nodes'][1]]['ansible_host'] }}"
+     master3_ip: "{{ hostvars[groups['master_nodes'][2]]['ansible_host'] }}"
+
+- file:
+    path: /etc/kubernetes/manifests
+    state: directory
+    mode: 0644
+
+- template:
+    src: templates/haproxy_apiserver.cfg.j2
+    dest: /etc/kubernetes/haproxy_apiserver.cfg
+    owner: root
+    group: root
+    mode: 0644
+
+- template:
+    src: templates/haproxy_apiserver.j2
+    dest: /etc/kubernetes/manifests/haproxy_apiserver.yaml
+    owner: root
+    group: root
+    mode: 0644
+
+# kubernetes components
+- template:
+    src: templates/kubelet.service.j2
+    dest: /etc/systemd/system/kubelet.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart kubelet.service
+
+
+- template:
+    src: templates/kube_config.j2
+    dest: /etc/kubernetes/kube_config.yaml
+    owner: root
+    group: root
+    mode: 0644
+
+- template:
+    src: templates/kube_proxy.j2
+    dest: /etc/kubernetes/manifests/kube_proxy.yaml
+    owner: root
+    group: root
+    mode: 0644
+
+- command: systemctl daemon-reload
+
+- service:
+    state: started
+    enabled: yes
+    name: kubelet

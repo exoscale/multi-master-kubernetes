@@ -1,0 +1,109 @@
+
+# Rules for the master nodes
+  - name: public to master ssh
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ master_security_group_name }}"
+     start_port: 22
+     end_port: 22
+  - name: public to master https (kubernetes api)
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ master_security_group_name }}"
+     start_port: 443
+     end_port: 443
+  # infra-etcd
+  - name: master to master etcd2 client ports
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ master_security_group_name }}"
+     user_security_group: "{{ master_security_group_name }}"
+     start_port: 2379
+     end_port: 2379
+  - name: worker to master etcd2 client ports
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ master_security_group_name }}"
+     user_security_group: "{{ worker_security_group_name }}"
+     start_port: 2379
+     end_port: 2379
+  - name: master to master etcd2 peer ports
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ master_security_group_name }}"
+     user_security_group: "{{ master_security_group_name }}"
+     start_port: 2380
+     end_port: 2380
+  # kubernetes-etcd
+  - name: master to master etcd2 client ports
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ master_security_group_name }}"
+     user_security_group: "{{ master_security_group_name }}"
+     start_port: 12379
+     end_port: 12379
+  - name: master to master etcd2 peer ports
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ master_security_group_name }}"
+     user_security_group: "{{ master_security_group_name }}"
+     start_port: 12380
+     end_port: 12380
+  -  name: master apiserver to master kubelet
+     local_action:
+       module: cs_securitygroup_rule
+       security_group: "{{ master_security_group_name }}"
+       user_security_group: "{{ master_security_group_name }}"
+       start_port: 10250
+       end_port: 10250
+       protocol: tcp
+
+# Rules for the worker nodes
+  - name: public to worker ssh
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ worker_security_group_name }}"
+     start_port: 22
+     end_port: 22
+  -  name: master apiserver to worker kubelet
+     local_action:
+       module: cs_securitygroup_rule
+       security_group: "{{ worker_security_group_name }}"
+       user_security_group: "{{ master_security_group_name }}"
+       start_port: 10250
+       end_port: 10250
+       protocol: tcp
+
+# Rules for vxlan between all masters and workers
+  -  name: vxlan master to master
+     local_action:
+       module: cs_securitygroup_rule
+       security_group: "{{ master_security_group_name }}"
+       user_security_group: "{{ master_security_group_name }}"
+       start_port: 8472
+       end_port: 8472
+       protocol: udp
+  -  name: vxlan worker to master
+     local_action:
+       module: cs_securitygroup_rule
+       security_group: "{{ master_security_group_name }}"
+       user_security_group: "{{ worker_security_group_name }}"
+       start_port: 8472
+       end_port: 8472
+       protocol: udp
+  -  name: vxlan worker to worker
+     local_action:
+       module: cs_securitygroup_rule
+       security_group: "{{ worker_security_group_name }}"
+       user_security_group: "{{ worker_security_group_name }}"
+       start_port: 8472
+       end_port: 8472
+       protocol: udp
+  -  name: vxlan master to worker
+     local_action:
+       module: cs_securitygroup_rule
+       security_group: "{{ worker_security_group_name }}"
+       user_security_group: "{{ master_security_group_name }}"
+       start_port: 8472
+       end_port: 8472
+       protocol: udp

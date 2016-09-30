@@ -1,0 +1,39 @@
+#cloud-config
+---
+hostname: {{ cluster_name }}-worker-{{ item }}
+
+coreos:
+    flannel:
+        etcd_endpoints: "https://{{ master1_ip }}:2379,https://{{ master2_ip }}:2379,https://{{ master3_ip }}:2379"
+        etcd_cafile: /etc/ssl/infra-etcd/ca.pem
+        etcd_certfile: /etc/ssl/infra-etcd/etcd-client.pem
+        etcd_keyfile: /etc/ssl/infra-etcd/etcd-client-key.pem
+
+    locksmith:
+        endpoint: "https://{{ master1_ip }}:2379,https://{{ master2_ip }}:2379,https://{{ master3_ip }}:2379"
+        etcd_cafile: /etc/ssl/infra-etcd/ca.pem
+        etcd_certfile: /etc/ssl/infra-etcd/etcd-client.pem
+        etcd_keyfile: /etc/ssl/infra-etcd/etcd-client-key.pem
+        window-start: 05:00
+        window-length: 1h
+
+    units:
+        -
+            name: flanneld.service
+            command: start
+            drop-ins:
+                -
+                    name: 10-etcd2-config.conf
+                    content: |
+                        [Service]
+                        Environment="ETCD_SSL_DIR=/etc/ssl/infra-etcd"
+                        ExecStartPre=/usr/bin/etcdctl --endpoints=https://{{ master1_ip }}:2379,https://{{ master2_ip }}:2379,https://{{ master3_ip }}:2379 --ca-file=/etc/ssl/infra-etcd/ca.pem --cert-file=/etc/ssl/infra-etcd/etcd-client.pem --key-file=/etc/ssl/infra-etcd/etcd-client-key.pem get /coreos.com/network/config
+        -
+            name: docker.service
+            command: start
+            drop-ins:
+                -
+                    name: 10-flannel-config.conf
+                    content: |
+                        [Unit]
+                        Requires=flanneld.service

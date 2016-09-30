@@ -1,0 +1,3 @@
+---
+  - include: _certificates.yml
+  - include: _master_components.yml

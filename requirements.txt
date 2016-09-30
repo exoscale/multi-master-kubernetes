@@ -1,0 +1,4 @@
+ansible==2.0.1.0
+cs==0.7.1
+sshpubkeys==2.2.0
+httplib2==0.9.2

@@ -1,0 +1,13 @@
+# Create k8s security group
+
+  - name: Create Security Group
+    local_action:
+     module: cs_securitygroup
+     name: "{{ master_security_group_name }}"
+     description: k8s master nodes
+
+  - name: Create Security Group
+    local_action:
+     module: cs_securitygroup
+     name: "{{ worker_security_group_name }}"
+     description: k8s worker nodes

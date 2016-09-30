@@ -1,0 +1,10 @@
+frontend ft_kube_apiserver
+    bind 0.0.0.0:8443
+    mode tcp
+    default_backend bk_kube_apiserver
+
+backend bk_kube_apiserver
+    mode tcp
+{% for item in groups['master_nodes'] %}
+    server item {{ hostvars[item]['ansible_host'] }}:443 check
+{% endfor %}

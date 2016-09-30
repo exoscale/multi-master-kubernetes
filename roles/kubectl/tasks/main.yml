@@ -1,0 +1,11 @@
+- name: kubectl config set-cluster
+  shell: kubectl config set-cluster default-cluster --server=https://"{{ hostvars[groups['master_nodes'][0]]['ansible_host'] }}" --certificate-authority=ssl/kubernetes/apiserver-ca.pem --embed-certs=true
+
+- name: kubectl config set-credentials
+  shell: kubectl config set-credentials default-admin --certificate-authority=ssl/ca.pem --client-key=ssl/kubernetes/kubectl-key.pem --client-certificate=ssl/kubernetes/kubectl.pem --embed-certs=true
+
+- name: kubectl config set-context
+  shell: kubectl config set-context default-system --cluster=default-cluster --user=default-admin
+
+- name: kubectl config use-context
+  shell: kubectl config use-context default-system

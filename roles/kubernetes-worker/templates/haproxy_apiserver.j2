@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: haproxy-apiserver
+  namespace: kube-system
+spec:
+  containers:
+    -
+      image: "haproxy:1.6"
+      name: haproxy-apiserver
+      ports:
+        -
+          containerPort: 8443
+          hostPort: 8443
+          name: apiserver
+      securityContext:
+        privileged: true
+      volumeMounts:
+        -
+          mountPath: /usr/local/etc/haproxy/haproxy.cfg
+          name: haproxyconfig
+          readOnly: true
+  hostNetwork: true
+  volumes:
+    -
+      hostPath:
+        path: /etc/kubernetes/haproxy_apiserver.cfg
+      name: haproxyconfig
