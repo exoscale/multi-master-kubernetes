@@ -10,7 +10,8 @@ spec:
       command:
         - /hyperkube
         - scheduler
-        - "--master=http://127.0.0.1:8080"
+        - "--master=https://127.0.0.1"
+        - "--kubeconfig=/etc/kubernetes/kube_config.yaml"
         - "--leader-elect=true"
       image: "quay.io/coreos/hyperkube:{{ k8s_version }}"
       livenessProbe:
@@ -21,4 +22,30 @@ spec:
         initialDelaySeconds: 15
         timeoutSeconds: 1
       name: kube-scheduler
+      volumeMounts:
+        -
+          mountPath: /etc/ssl/certs
+          name: ssl-certs
+          readOnly: true
+        -
+          mountPath: /etc/kubernetes/kube_config.yaml
+          name: kubeconfig
+          readOnly: true
+        -
+          mountPath: /etc/kubernetes/ssl
+          name: etc-kube-ssl
+          readOnly: true
   hostNetwork: true
+  volumes:
+    -
+      hostPath:
+        path: /usr/share/ca-certificates
+      name: ssl-certs
+    -
+      hostPath:
+        path: /etc/kubernetes/kube_config.yaml
+      name: kubeconfig
+    -
+      hostPath:
+        path: /etc/kubernetes/ssl
+      name: etc-kube-ssl
