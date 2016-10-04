@@ -4,6 +4,8 @@ kind: Pod
 metadata:
   name: kube-scheduler
   namespace: kube-system
+  labels:
+    k8s-app: kube-scheduler
 spec:
   containers:
     -
