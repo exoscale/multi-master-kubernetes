@@ -10,7 +10,7 @@ spec:
       command:
         - /hyperkube
         - proxy
-        - "--master=http://127.0.0.1:8080"
+        - "--master=https://127.0.0.1"
         - "--kubeconfig=/etc/kubernetes/kube_config.yaml"
         - "--proxy-mode=iptables"
       image: "quay.io/coreos/hyperkube:{{ k8s_version }}"
@@ -21,6 +21,7 @@ spec:
         -
           mountPath: /etc/ssl/certs
           name: ssl-certs
+          readOnly: true
         -
           mountPath: /etc/kubernetes/kube_config.yaml
           name: kubeconfig

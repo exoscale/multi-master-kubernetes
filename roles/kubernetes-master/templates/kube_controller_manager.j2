@@ -10,7 +10,8 @@ spec:
       command:
         - /hyperkube
         - controller-manager
-        - "--master=http://127.0.0.1:8080"
+        - "--master=https://127.0.0.1"
+        - "--kubeconfig=/etc/kubernetes/kube_config.yaml"
         - "--leader-elect=true"
         - "--service-account-private-key-file=/etc/kubernetes/ssl/service-account-key.pem"
         - "--root-ca-file=/etc/kubernetes/ssl/apiserver-ca.pem"
@@ -32,12 +33,20 @@ spec:
           mountPath: /etc/ssl/certs
           name: ssl-certs-host
           readOnly: true
+        -
+          mountPath: /etc/kubernetes/kube_config.yaml
+          name: kubeconfig
+          readOnly: true
   hostNetwork: true
   volumes:
     -
       hostPath:
         path: /etc/kubernetes/ssl
       name: ssl-certs-kubernetes
+    -
+      hostPath:
+        path: /etc/kubernetes/kube_config.yaml
+      name: kubeconfig
     -
       hostPath:
         path: /usr/share/ca-certificates
