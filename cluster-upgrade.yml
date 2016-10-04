@@ -1,0 +1,68 @@
+---
+# Prefetch new images to minimize service restart time
+- hosts: master_nodes
+  tasks:
+    - name: prefetch new etcd version
+      shell: "docker pull gcr.io/google_containers/etcd:{{ k8s_etcd_version }}"
+
+- hosts: all
+  tasks:
+    - name: prefetch new rkt hyperkube version
+      shell: "rkt fetch quay.io/coreos/hyperkube:{{ k8s_version }}"
+    - name: prefetch new docker hyperkube version
+      shell: "docker pull quay.io/coreos/hyperkube:{{ k8s_version }}"
+
+# Make sure httplib2 is installed (required for api version check below)
+- hosts: all
+  tasks:
+    - name: pip install httplib2
+      pip: name=httplib2
+
+# Upgrade kubernetes on master_nodes
+- hosts: master_nodes
+  vars:
+    - k8s_git_version: "{{ k8s_version | regex_replace('_', '+') }}"
+  become: true
+  roles:
+    - kubernetes-master
+  tasks:
+    - debug: msg="Waiting for api to report correct version"
+    - uri:
+        url: http://127.0.0.1:8080/version
+        return_content: yes
+      register: version
+      until: "'json' in version and version.json['gitVersion'] == '{{ k8s_git_version }}'"
+      retries: 10
+      delay: 10
+  serial: 1
+
+# Upgrade kubernetes on worker_nodes
+- hosts: worker_nodes
+  vars:
+    - k8s_git_version: "{{ k8s_version | regex_replace('_', '+') }}"
+  become: true
+  roles:
+    - kubernetes-worker
+  serial: 1
+
+# Check all versions
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: "check etcd versions"
+      shell: "kubectl --namespace=kube-system get pod -l k8s-app=etcd -o jsonpath={$..containers..image}"
+      register: result
+      until: result.stdout.find("{{ k8s_etcd_version }}") != -1
+      retries: 5
+      delay: 10
+    - name: "check all kube-* versions"
+      shell: "kubectl --namespace=kube-system get pod -l k8s-app={{ item }} -o jsonpath={$..containers..image}"
+      register: result
+      until: result.stdout.find("{{ k8s_version }}") != -1
+      retries: 5
+      delay: 10
+      with_items:
+        - kube-apiserver
+        - kube-scheduler
+        - kube-controller-manager
+        - kube-proxy
