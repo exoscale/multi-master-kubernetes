@@ -3,17 +3,21 @@
       master2_ip: "{{ hostvars[groups['master_nodes'][1]]['ansible_host'] }}"
       master3_ip: "{{ hostvars[groups['master_nodes'][2]]['ansible_host'] }}"
 
+  - set_fact:
+      worker_hostnames: "{{ worker_hostnames | default([]) }} + [ '{{ cluster_name }}-worker-{{ (ansible_date_time.epoch + item) | to_uuid | truncate(7, True, '') }}' ]"
+    with_sequence: count={{ num_worker_nodes }}
+
   - name: Create worker nodes
     local_action:
       module: cs_instance
-      name: "{{ cluster_name }}-worker-{{ (ansible_date_time.epoch + item) | to_uuid | truncate(7, True, '') }}"
+      name: "{{ item }}"
       template: "Linux CoreOS stable 1122 64-bit 50G Disk (2016-09-06-dcb493)"
       service_offering: "{{ worker_instance_size }}"
       ssh_key: "{{ ssh_key }}"
       security_groups: [ '{{ worker_security_group_name }}' ]
       user_data: "{{ lookup('template', '../templates/worker_user_data.j2') }}"
       zone: "{{ cluster_zone }}"
-    with_sequence: count={{ num_worker_nodes }}
+    with_items: "{{ worker_hostnames }}"
     register: created_worker_nodes
     when: "'worker_nodes' not in groups or groups['worker_nodes']|length < {{ desired_num_worker_nodes }}"
 

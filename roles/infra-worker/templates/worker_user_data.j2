@@ -1,6 +1,6 @@
 #cloud-config
 ---
-hostname: {{ cluster_name }}-worker-{{ item }}
+hostname: "{{ item }}"
 
 coreos:
     flannel:
