@@ -12,11 +12,12 @@
   with_items: "{{ groups['master_nodes'] }}"
 
 - name: create kubernetes service account certificates
-  shell: echo '{{ lookup('template', '../templates/rsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/apiserver-ca.pem -ca-key=kubernetes/apiserver-ca-key.pem -config=ca_config.json -profile=server -hostname="127.0.0.1,10.100.0.1,{{ hostvars[item]['ansible_host'] }}" - | bin/cfssljson -bare "kubernetes/{{ item }}/service-account"
+  shell: echo '{{ lookup('template', '../templates/rsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/apiserver-ca.pem -ca-key=kubernetes/apiserver-ca-key.pem -config=ca_config.json -profile=server -hostname="10.100.0.1" - | bin/cfssljson -bare "kubernetes/{{ item }}"
   args:
     chdir: ssl
-    creates: kubernetes/{{ item }}/service-account.pem
-  with_items: "{{ groups['master_nodes'] }}"
+    creates: kubernetes/{{ item }}.pem
+  with_items:
+    - service-account
 
 - name: create kubernetes apiserver client certificates
   shell: echo '{{ lookup('template', '../templates/ecdsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/apiserver-ca.pem -ca-key=kubernetes/apiserver-ca-key.pem -config=ca_config.json -profile=client - | bin/cfssljson -bare "kubernetes/{{ item }}/apiserver-client"

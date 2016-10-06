@@ -89,11 +89,11 @@
     dest: /etc/kubernetes/ssl/apiserver-key.pem
 
 - copy:
-    src: ssl/kubernetes/{{ ansible_hostname }}/service-account.pem
+    src: ssl/kubernetes/service-account.pem
     dest: /etc/kubernetes/ssl/service-account.pem
 
 - copy:
-    src: ssl/kubernetes/{{ ansible_hostname }}/service-account-key.pem
+    src: ssl/kubernetes/service-account-key.pem
     dest: /etc/kubernetes/ssl/service-account-key.pem
 
 - copy:
