@@ -65,6 +65,18 @@
      security_group: "{{ worker_security_group_name }}"
      start_port: 22
      end_port: 22
+  - name: public to worker http
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ worker_security_group_name }}"
+     start_port: 80
+     end_port: 80
+  - name: public to worker https
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ worker_security_group_name }}"
+     start_port: 443
+     end_port: 443
   -  name: master apiserver to worker kubelet
      local_action:
        module: cs_securitygroup_rule

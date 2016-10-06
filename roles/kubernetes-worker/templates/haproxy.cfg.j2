@@ -1,0 +1,31 @@
+defaults
+    mode tcp
+    timeout client 10s
+    timeout connect 4s
+    timeout server 30s
+
+# http to nginx-ingress-controller
+frontend ft_ingress_http
+    bind 0.0.0.0:80
+    default_backend bk_ingress_http
+
+backend bk_ingress_http
+    server localhost 127.0.0.1:30080 check
+
+# https to nginx-ingress-controller
+frontend ft_ingress_https
+    bind 0.0.0.0:443
+    default_backend bk_ingress_https
+
+backend bk_ingress_https
+    server localhost 127.0.0.1:30443 check
+
+# local worker proxy to apiserver on all masters
+frontend ft_kube_apiserver
+    bind 127.0.0.1:8443
+    default_backend bk_kube_apiserver
+
+backend bk_kube_apiserver
+{% for item in groups['master_nodes'] %}
+    server {{ hostvars[item]['ansible_hostname'] }} {{ hostvars[item]['ansible_host'] }}:443 check
+{% endfor %}

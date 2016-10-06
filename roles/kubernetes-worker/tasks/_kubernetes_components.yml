@@ -9,15 +9,15 @@
     mode: 0644
 
 - template:
-    src: templates/haproxy_apiserver.cfg.j2
-    dest: /etc/kubernetes/haproxy_apiserver.cfg
+    src: templates/haproxy.cfg.j2
+    dest: /etc/kubernetes/haproxy.cfg
     owner: root
     group: root
     mode: 0644
 
 - template:
-    src: templates/haproxy_apiserver.j2
-    dest: /etc/kubernetes/manifests/haproxy_apiserver.yaml
+    src: templates/haproxy.j2
+    dest: /etc/kubernetes/manifests/haproxy.yaml
     owner: root
     group: root
     mode: 0644
