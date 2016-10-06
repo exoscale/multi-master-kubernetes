@@ -1,13 +1,11 @@
 ---
-# Setup ssh-keys, security_groups, anti_affinity_groups and start VMs
+# Start VMs
 - hosts: localhost
   connection: local
   vars:
     - num_worker_nodes: "{{ (desired_num_worker_nodes | int) - (groups['worker_nodes'] | length) }}"
   roles:
     - infra-worker
-  tasks:
-    - debug: var="{{ (desired_num_worker_nodes | int) - (groups['worker_nodes'] | length) }}"
 
 # Bootstrap ansible for CoreOS
 - hosts: worker_nodes
