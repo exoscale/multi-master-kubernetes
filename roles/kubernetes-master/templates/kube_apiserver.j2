@@ -12,6 +12,7 @@ spec:
       command:
         - /hyperkube
         - apiserver
+        - "--apiserver-count=3"
         - "--bind-address=0.0.0.0"
         - "--etcd-servers=https://127.0.0.1:12379"
         - "--etcd-cafile=/etc/kubernetes/ssl/etcd-ca.pem"
