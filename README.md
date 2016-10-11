@@ -47,6 +47,18 @@ nodes. Below command adds 2 more for a total of 5.
 ansible-playbook -e desired_num_worker_nodes=5 worker-add.yml
 ```
 
+## Update Kubernetes
+
+The cluster-upgrade playbook takes care of one by one updating Kubernetes on
+each of the nodes and restarting services as required. The upgrade does lead to
+a short unavailability of the apiserver due to the restart of the etcd members.
+Member restarts take a couple of retries before they succeed, this is caused by
+ports still being in use.
+
+```
+ansible-playbook cluster-upgrade.yml
+```
+
 ## Architecture
 
 The initial cluster consists of 3 master nodes and 3 worker nodes. Master nodes
@@ -73,7 +85,7 @@ __Worker nodes run:__
  * dockerd
  * kubelet
  * kube-proxy
- * haproxy: to workaround kubelet and kube-proxy single apiserver limitation
+ * haproxy
  * and your containers of course
 
 Flanneld, Locksmithd, Docker, infra-etcd2 and the kubelet are started using
@@ -85,6 +97,19 @@ sure only one of the six cluster nodes reboots at the same time. It is also
 configured to ensure a maintenance window for master nodes between 4 and 5am
 and for worker nodes between 5 and 6am daily. Automatic updates only include
 the OS components that are part of CoreOS.
+
+## Ingress
+
+Cluster bootstrap includes the nginx-ingress-controller to make services
+available externally using ingress resources.
+
+Haproxy on each worker node listens on `0.0.0.0:80` and `0.0.0.0:443` and
+forwards TCP traffic to the ingress controller service.
+
+Simply setup a wildcard DNS entry to point to the IPs of your worker nodes.
+
+[Kube-lego](https://github.com/jetstack/kube-lego) is supported by the
+nginx-ingress-controller but is not automatically installed.
 
 ## Security
 
@@ -110,15 +135,3 @@ master node is unavailable, you need to update your kubectl config to talk
 to another master node or bring the master node back up.
 You can of course setup DNS A records for each one of your nodes and use
 a DNS name instead of the IP in your config.
-
-### Kube-dns
-
-kube-dns sometimes fails to come up due to a race condition. The pod starts
-before the service account token is created. To fix this. Simply delete the
-pod.
-
-```
-kubectl --namespace=kube-system delete pod \
-$( kubectl --namespace=kube-system get pods \
-    -l k8s-app=kube-dns -o jsonpath={.items[0]..metadata.name} )
-```
