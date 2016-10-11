@@ -6,6 +6,14 @@ This Ansible playbook helps you setup a multi-master
 
 ## Getting started
 
+Put the api-key and api-secret for your account into the `cloudstack.ini` file.
+Alternatively you can also use the `CLOUDSTACK_KEY` and `CLOUDSTACK_SECRET`
+environment variables. If you do, make sure to remove `key` and `secret` from
+the ini file.
+
+You can get your key and secret here:
+https://portal.exoscale.ch/account/profile/api
+
 To bootstrap your cluster, install the requirements via `pip` and put `kubectl`
 in your path. Then run the playbook.
 
