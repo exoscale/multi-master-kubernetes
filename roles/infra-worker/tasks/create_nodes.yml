@@ -10,7 +10,7 @@
   - name: Create worker nodes
     local_action:
       module: cs_instance
-      name: "{{ item }}"
+      display_name: "{{ item }}"
       template: "Linux CoreOS stable 1122 64-bit 50G Disk (2016-09-06-dcb493)"
       service_offering: "{{ worker_instance_size }}"
       ssh_key: "{{ ssh_key }}"
