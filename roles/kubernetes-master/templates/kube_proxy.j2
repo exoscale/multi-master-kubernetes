@@ -16,6 +16,9 @@ spec:
         - "--kubeconfig=/etc/kubernetes/kube_config.yaml"
         - "--proxy-mode=iptables"
       image: "quay.io/coreos/hyperkube:{{ k8s_version }}"
+      resources:
+        requests:
+          cpu: 100m
       name: kube-proxy
       securityContext:
         privileged: true

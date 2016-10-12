@@ -18,14 +18,21 @@ spec:
         - "--service-account-private-key-file=/etc/kubernetes/ssl/service-account-key.pem"
         - "--root-ca-file=/etc/kubernetes/ssl/apiserver-ca.pem"
       image: "quay.io/coreos/hyperkube:{{ k8s_version }}"
+      imagePullPolicy: IfNotPresent
       livenessProbe:
         httpGet:
           host: "127.0.0.1"
           path: /healthz
           port: 10252
+          scheme: HTTP
         initialDelaySeconds: 15
-        timeoutSeconds: 1
+        timeoutSeconds: 15
       name: kube-controller-manager
+      resources:
+        limits:
+          cpu: 200m
+        requests:
+          cpu: 200m
       volumeMounts:
         -
           mountPath: /etc/kubernetes/ssl
@@ -39,7 +46,10 @@ spec:
           mountPath: /etc/kubernetes/kube_config.yaml
           name: kubeconfig
           readOnly: true
+  dnsPolicy: ClusterFirst
   hostNetwork: true
+  restartPolicy: Always
+  terminationGracePeriodSeconds: 30
   volumes:
     -
       hostPath:

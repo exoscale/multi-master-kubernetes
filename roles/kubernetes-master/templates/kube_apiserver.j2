@@ -29,7 +29,16 @@ spec:
         - "--service-account-key-file=/etc/kubernetes/ssl/service-account-key.pem"
         - "--runtime-config=extensions/v1beta1=true"
       image: "quay.io/coreos/hyperkube:{{ k8s_version }}"
+      imagePullPolicy: IfNotPresent
       name: kube-apiserver
+      livenessProbe:
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 8080
+        scheme: HTTP
+      initialDelaySeconds: 15
+      timeoutSeconds: 15
       ports:
         -
           containerPort: 443
@@ -39,6 +48,9 @@ spec:
           containerPort: 8080
           hostPort: 8080
           name: local
+      resources:
+        requests:
+          cpu: 250m
       volumeMounts:
         -
           mountPath: /etc/kubernetes/ssl

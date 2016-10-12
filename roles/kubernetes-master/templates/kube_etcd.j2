@@ -28,6 +28,7 @@ spec:
            --peer-client-cert-auth \
            --data-dir /var/etcd/data-{{ ansible_hostname }}"
       image: "gcr.io/google_containers/etcd:{{ k8s_etcd_version }}"
+      imagePullPolicy: IfNotPresent
       livenessProbe:
         tcpSocket:
           host: "127.0.0.1"
@@ -44,6 +45,9 @@ spec:
           containerPort: 12379
           hostPort: 12379
           name: clientport
+      resources:
+        requests:
+          cpu: 200m
       volumeMounts:
         -
           mountPath: /var/etcd
@@ -57,7 +61,10 @@ spec:
           mountPath: /etc/ssl/kubernetes-etcd
           name: etcsslkubernetesetcd
           readOnly: true
+  dnsPolicy: ClusterFirst
   hostNetwork: true
+  restartPolicy: Always
+  terminationGracePeriodSeconds: 30
   volumes:
     -
       hostPath:

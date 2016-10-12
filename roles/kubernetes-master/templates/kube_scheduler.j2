@@ -22,8 +22,11 @@ spec:
           path: /healthz
           port: 10251
         initialDelaySeconds: 15
-        timeoutSeconds: 1
+        timeoutSeconds: 15
       name: kube-scheduler
+      resources:
+        requests:
+          cpu: 100m
       volumeMounts:
         -
           mountPath: /etc/ssl/certs
@@ -37,7 +40,10 @@ spec:
           mountPath: /etc/kubernetes/ssl
           name: etc-kube-ssl
           readOnly: true
+  dnsPolicy: ClusterFirst
   hostNetwork: true
+  restartPolicy: Always
+  terminationGracePeriodSeconds: 30
   volumes:
     -
       hostPath:
