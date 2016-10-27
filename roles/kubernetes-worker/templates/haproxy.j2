@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
     -
-      image: "haproxy:1.6"
+      image: "haproxy:{{ haproxy_version }}"
       name: haproxy
       securityContext:
         privileged: true

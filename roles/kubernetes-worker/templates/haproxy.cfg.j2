@@ -1,8 +1,10 @@
 defaults
     mode tcp
-    timeout client 10s
-    timeout connect 4s
-    timeout server 30s
+    timeout connect {{ haproxy_timeout_connect }}
+    timeout client {{ haproxy_timeout_client }}
+    timeout client-fin {{ haproxy_timeout_client_fin }}
+    timeout server {{ haproxy_timeout_server }}
+    timeout tunnel {{ haproxy_timeout_tunnel }}
 
 # http to nginx-ingress-controller
 frontend ft_ingress_http

@@ -21,3 +21,16 @@ service_cluster_ip_range: "10.100.0.0/16"
 
 # certificate variables
 cfssl_version: "R1.2"
+
+# ingress variables
+haproxy_version: 1.6
+
+haproxy_timeout_connect: 10s
+haproxy_timeout_client: 30s
+haproxy_timeout_client_fin: 30s
+haproxy_timeout_server: 30s
+haproxy_timeout_tunnel: 3600s
+
+nginx_proxy_connect_timeout: 10s
+nginx_proxy_read_timeout: 30s
+nginx_proxy_send_timeout: 30s
