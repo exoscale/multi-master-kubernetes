@@ -80,9 +80,9 @@ metadata:
   name: nginx-ingress-controller
   namespace: kube-system
 data:
-  proxy-connect-timeout: {{ nginx_proxy_connect_timeout }}
-  proxy-read-timeout: {{ nginx_proxy_read_timeout }}
-  proxy-send-timeout: {{ nginx_proxy_send_timeout }}
+  proxy-connect-timeout: "{{ nginx_proxy_connect_timeout }}"
+  proxy-read-timeout: "{{ nginx_proxy_read_timeout }}"
+  proxy-send-timeout: "{{ nginx_proxy_send_timeout }}"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
