@@ -10,13 +10,13 @@
 
 - name: download cfssl
   get_url:
-    url: https://pkg.cfssl.org/{{ cfssl_version }}/cfssl_linux-amd64
+    url: https://pkg.cfssl.org/{{ cfssl_version }}/cfssl_{{ ansible_system|lower }}-amd64
     dest: ssl/bin/cfssl
     mode: 0755
 
 - name: download cfssljson
   get_url:
-    url: https://pkg.cfssl.org/{{ cfssl_version }}/cfssljson_linux-amd64
+    url: https://pkg.cfssl.org/{{ cfssl_version }}/cfssljson_{{ ansible_system|lower }}-amd64
     dest: ssl/bin/cfssljson
     mode: 0755
 
