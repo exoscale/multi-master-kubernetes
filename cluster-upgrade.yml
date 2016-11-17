@@ -1,4 +1,11 @@
 ---
+# Cleanup old rkt images
+- hosts: all
+  tasks:
+    - name: garbage collect rkt images unused for more than 24h
+      shell: "rkt image gc"
+  become: true
+
 # Prefetch new images to minimize service restart time
 - hosts: master_nodes
   tasks:
@@ -7,8 +14,6 @@
 
 - hosts: all
   tasks:
-    - name: garbage collect rkt images unused for more than 24h
-      shell: "rkt image gc"
     - name: prefetch new rkt hyperkube version
       shell: "rkt fetch quay.io/coreos/hyperkube:{{ k8s_version }}"
     - name: prefetch new docker hyperkube version
