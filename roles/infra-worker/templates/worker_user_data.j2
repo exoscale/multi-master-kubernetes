@@ -9,6 +9,9 @@ coreos:
         etcd_certfile: /etc/ssl/infra-etcd/etcd-client.pem
         etcd_keyfile: /etc/ssl/infra-etcd/etcd-client-key.pem
 
+    update:
+        reboot-strategy: etcd-lock
+
     locksmith:
         endpoint: "https://{{ master1_ip }}:2379,https://{{ master2_ip }}:2379,https://{{ master3_ip }}:2379"
         etcd_cafile: /etc/ssl/infra-etcd/ca.pem
