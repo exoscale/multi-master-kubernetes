@@ -7,6 +7,8 @@
 
 - hosts: all
   tasks:
+    - name: garbage collect rkt images unused for more than 24h
+      shell: "rkt image gc"
     - name: prefetch new rkt hyperkube version
       shell: "rkt fetch quay.io/coreos/hyperkube:{{ k8s_version }}"
     - name: prefetch new docker hyperkube version
