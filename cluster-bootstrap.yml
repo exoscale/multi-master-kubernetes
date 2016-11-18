@@ -44,10 +44,9 @@
   roles:
     - infra-inventory
 
-# Setup kubectl and deploy sky-dns and an nginx-ingress-controller
+# Setup kubectl and deploy addons
 - hosts: localhost
   connection: local
   roles:
     - kubectl
-    - kube-dns
-    - nginx-ingress
+    - addons
