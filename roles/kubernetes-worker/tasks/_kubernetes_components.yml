@@ -32,7 +32,6 @@
     mode: 0644
   notify: restart kubelet.service
 
-
 - template:
     src: templates/kube_config.j2
     dest: /etc/kubernetes/kube_config.yaml
