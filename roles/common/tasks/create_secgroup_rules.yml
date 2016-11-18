@@ -86,6 +86,24 @@
        end_port: 10250
        protocol: tcp
 
+# Rules for Heapster worker->worker and worker->master
+  -  name: heapster to master kubelet
+     local_action:
+       module: cs_securitygroup_rule
+       security_group: "{{ master_security_group_name }}"
+       user_security_group: "{{ worker_security_group_name }}"
+       start_port: 10255
+       end_port: 10255
+       protocol: tcp
+  -  name: heapster to worker kubelet
+     local_action:
+       module: cs_securitygroup_rule
+       security_group: "{{ worker_security_group_name }}"
+       user_security_group: "{{ worker_security_group_name }}"
+       start_port: 10255
+       end_port: 10255
+       protocol: tcp
+
 # Rules for vxlan between all masters and workers
   -  name: vxlan master to master
      local_action:

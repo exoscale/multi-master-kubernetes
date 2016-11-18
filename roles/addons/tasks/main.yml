@@ -18,6 +18,14 @@
 - name: kubectl apply kube-dns
   shell: kubectl apply -f "{{ tempfile.stdout }}"
 
+# Heapster
+- template:
+    src: templates/heapster.j2
+    dest: "{{ tempfile.stdout }}"
+
+- name: kubectl apply heapster
+  shell: kubectl apply -f "{{ tempfile.stdout }}"
+
 # Nginx Ingress
 - template:
     src: templates/nginx_ingress.j2

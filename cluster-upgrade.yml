@@ -1,4 +1,10 @@
 ---
+# Upgrade security groups if necessary
+- hosts: localhost
+  connection: local
+  roles:
+    - common
+
 # Cleanup old rkt images
 - hosts: all
   tasks:
@@ -73,3 +79,10 @@
         - kube-scheduler
         - kube-controller-manager
         - kube-proxy
+
+# Setup kubectl and deploy addons
+- hosts: localhost
+  connection: local
+  roles:
+    - kubectl
+    - addons
