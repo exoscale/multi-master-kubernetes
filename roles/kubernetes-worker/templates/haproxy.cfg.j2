@@ -22,6 +22,14 @@ frontend ft_ingress_https
 backend bk_ingress_https
     server localhost 127.0.0.1:30443 check
 
+# localhost private docker registry
+frontend ft_private_registry
+    bind 127.0.0.1:5000
+    default_backend bk_private_registry
+
+backend bk_private_registry
+    server localhost 127.0.0.1:32500 check
+
 # local worker proxy to apiserver on all masters
 frontend ft_kube_apiserver
     bind 127.0.0.1:8443

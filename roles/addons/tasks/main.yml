@@ -33,3 +33,24 @@
 
 - name: kubectl apply nginx-ingress
   shell: kubectl apply -f "{{ tempfile.stdout }}"
+
+# Registry
+- set_fact: EXO_API_KEY="{{ lookup('ini', 'key section=cloudstack file=cloudstack.ini') }}"
+- set_fact: EXO_API_SECRET="{{ lookup('ini', 'secret section=cloudstack file=cloudstack.ini') }}"
+- set_fact: bucket_name="{{ cluster_name }}-registry-{{ (cluster_name + EXO_API_KEY) | md5 | reverse | truncate(7, True, '') }}"
+- set_fact: registry_secret="{{ lookup('password', 'secret/registry_secret length=64') }}"
+
+- s3_bucket:
+    access_key: "{{ EXO_API_KEY }}"
+    secret_key: "{{ EXO_API_SECRET }}"
+    name: "{{ bucket_name }}"
+    region: "{{ region }}"
+    s3_url: "https://{{ region_endpoint }}"
+    ceph: true
+
+- template:
+    src: templates/registry.j2
+    dest: "{{ tempfile.stdout }}"
+
+- name: kubectl apply nginx-ingress
+  shell: kubectl apply -f "{{ tempfile.stdout }}"
