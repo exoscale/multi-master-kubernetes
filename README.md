@@ -6,32 +6,24 @@ This Ansible playbook helps you setup a multi-master
 
 ## Getting started
 
-Put the api-key and api-secret for your account into the `cloudstack.ini` file.
-Alternatively you can also use the `CLOUDSTACK_KEY` and `CLOUDSTACK_SECRET`
-environment variables. If you do, make sure to remove `key` and `secret` from
-the ini file.
+To run this playbook a working Docker installation and a basic understanding
+of containers and volumes is required. You also need a Exoscale account and
+the corresponding API key and secret.
 
 You can get your key and secret here:
 https://portal.exoscale.ch/account/profile/api
 
-To bootstrap your cluster, install the requirements via `pip` and put `kubectl`
-in your path. Then run the playbook.
-
-> Warning: Ansible doesn't play nice in a Virtualenv on systems with Selinux.
-> To fix this, make sure you have python-selinux bindings installed and include
-> system packages in your virtualenv.
+Let's bootstrap a cluster.
 
 ```
-# only required when selinux is enabled
-sudo dnf install libselinux-python
+# Run the container and mount a data volume for the cluster specific secrets
+docker run -ti -v k8s_secrets:/secret exoscale/multi-master-kubernetes
 
-virtualenv --system-site-packages .venv
-source .venv/bin/activate
+# Set EXO_API_KEY and EXO_API_SECRET environment variables
+export EXO_API_KEY=
+export EXO_API_SECRET=
 
-# install the requirements
-pip install -r requirements.txt
-
-# run the Ansible playbook
+# Then run the cluster-bootstrap playbook
 ansible-playbook cluster-bootstrap.yml
 ```
 
@@ -44,6 +36,10 @@ you can see the cluster nodes come up using:
 ```
 kubectl get nodes -w
 ```
+
+> Note: kubectl is setup automatically inside the container. To use it outside
+> the container as well, simply get the `kubeconfig` file from that data volume
+> and copy it into `~/.kube/config`
 
 ## Add more worker nodes
 

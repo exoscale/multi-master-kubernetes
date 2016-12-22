@@ -1,4 +1,4 @@
-ansible-2.2.0
+ansible==2.2.0.0
 boto==2.43.0
 cs==0.7.1
 sshpubkeys==2.2.0

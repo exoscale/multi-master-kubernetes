@@ -1,5 +1,0 @@
-# Create inventory file
-- name: write inventory file
-  template:
-    src: inventory.j2
-    dest: ./inventory

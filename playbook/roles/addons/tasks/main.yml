@@ -1,0 +1,57 @@
+- debug:
+    msg: Wait up to 10 minutes for our cluster to initialize and come up before we can deploy addons.
+
+- wait_for:
+    port: 443
+    host: "{{ hostvars[groups['master_nodes'][0]]['ansible_host'] }}"
+    timeout: 600
+
+- name: tempfile
+  shell: mktemp
+  register: tempfile
+
+# DNS
+- template:
+    src: templates/kube_dns.j2
+    dest: "{{ tempfile.stdout }}"
+
+- name: kubectl apply kube-dns
+  shell: kubectl --kubeconfig=/secret/kubeconfig apply -f "{{ tempfile.stdout }}"
+
+# Heapster
+- template:
+    src: templates/heapster.j2
+    dest: "{{ tempfile.stdout }}"
+
+- name: kubectl apply heapster
+  shell: kubectl --kubeconfig=/secret/kubeconfig apply -f "{{ tempfile.stdout }}"
+
+# Nginx Ingress
+- template:
+    src: templates/nginx_ingress.j2
+    dest: "{{ tempfile.stdout }}"
+
+- name: kubectl apply nginx-ingress
+  shell: kubectl --kubeconfig=/secret/kubeconfig apply -f "{{ tempfile.stdout }}"
+
+# Registry
+- set_fact: EXO_API_KEY="{{ lookup('ini', 'key section=cloudstack file=../secret/cloudstack.ini') }}"
+- set_fact: EXO_API_SECRET="{{ lookup('ini', 'secret section=cloudstack file=../secret/cloudstack.ini') }}"
+- set_fact: EXO_SOS_ENDPOINT="{{ lookup('env', 'EXO_SOS_ENDPOINT') | default(region_endpoint, true) }}"
+- set_fact: bucket_name="{{ cluster_name }}-registry-{{ (cluster_name + EXO_API_KEY) | md5 | reverse | truncate(7, True, '') }}"
+- set_fact: registry_secret="{{ lookup('password', '../secret/registry_secret length=64') }}"
+
+- s3_bucket:
+    access_key: "{{ EXO_API_KEY }}"
+    secret_key: "{{ EXO_API_SECRET }}"
+    name: "{{ bucket_name }}"
+    region: "{{ region }}"
+    s3_url: "https://{{ EXO_SOS_ENDPOINT }}"
+    ceph: true
+
+- template:
+    src: templates/registry.j2
+    dest: "{{ tempfile.stdout }}"
+
+- name: kubectl apply nginx-ingress
+  shell: kubectl --kubeconfig=/secret/kubeconfig apply -f "{{ tempfile.stdout }}"

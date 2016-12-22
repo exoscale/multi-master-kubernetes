@@ -1,0 +1,17 @@
+- stat: path=inventory
+  register: inventory_move_required
+
+- copy:
+    src: inventory
+    dest: ../secret/inventory
+  when: inventory_move_required.stat.exists
+
+- file:
+    path: inventory
+    state: absent
+  when: inventory_move_required.stat.exists
+
+- name: write inventory file
+  template:
+    src: inventory.j2
+    dest: ../secret/inventory

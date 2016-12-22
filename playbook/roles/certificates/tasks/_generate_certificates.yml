@@ -1,0 +1,72 @@
+- file:
+    path: ../secret/ssl/kubernetes/{{ item }}
+    state: directory
+    mode: 0770
+  with_items: "{{ groups['all'] }}"
+
+- name: create kubernetes apiserver certificates
+  shell: echo '{{ lookup('template', '../templates/ecdsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/apiserver-ca.pem -ca-key=kubernetes/apiserver-ca-key.pem -config=ca_config.json -profile=server -hostname="127.0.0.1,10.100.0.1,{{ hostvars[item]['ansible_host'] }}" - | bin/cfssljson -bare "kubernetes/{{ item }}/apiserver"
+  args:
+    chdir: ../secret/ssl
+    creates: kubernetes/{{ item }}/apiserver.pem
+  with_items: "{{ groups['master_nodes'] }}"
+
+- name: create kubernetes service account certificates
+  shell: echo '{{ lookup('template', '../templates/rsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/apiserver-ca.pem -ca-key=kubernetes/apiserver-ca-key.pem -config=ca_config.json -profile=server -hostname="10.100.0.1" - | bin/cfssljson -bare "kubernetes/{{ item }}"
+  args:
+    chdir: ../secret/ssl
+    creates: kubernetes/{{ item }}.pem
+  with_items:
+    - service-account
+
+- name: create kubernetes apiserver client certificates
+  shell: echo '{{ lookup('template', '../templates/ecdsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/apiserver-ca.pem -ca-key=kubernetes/apiserver-ca-key.pem -config=ca_config.json -profile=client - | bin/cfssljson -bare "kubernetes/{{ item }}/apiserver-client"
+  args:
+    chdir: ../secret/ssl
+    creates: kubernetes/{{ item }}/apiserver-client.pem
+  with_items: "{{ groups['all'] }}"
+
+- name: create kubectl client certificate
+  shell: echo '{{ lookup('template', '../templates/ecdsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/apiserver-ca.pem -ca-key=kubernetes/apiserver-ca-key.pem -config=ca_config.json -profile=client - | bin/cfssljson -bare "kubernetes/kubectl"
+  args:
+    chdir: ../secret/ssl
+    creates: kubernetes/kubectl.pem
+  with_items:
+    - kubectl
+
+# kubernetes-etcd certificates
+- name: create kubernetes etcd server certificates
+  shell: echo '{{ lookup('template', '../templates/ecdsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/etcd-ca.pem -ca-key=kubernetes/etcd-ca-key.pem -config=ca_config.json -profile=client-server -hostname="127.0.0.1,{{ hostvars[item]['ansible_host'] }}" - | bin/cfssljson -bare "kubernetes/{{ item }}/etcd"
+  args:
+    chdir: ../secret/ssl
+    creates: kubernetes/{{ item }}/etcd.pem
+  with_items: "{{ groups['master_nodes'] }}"
+
+
+- name: create kubernetes etcd client certificates
+  shell: echo '{{ lookup('template', '../templates/ecdsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/etcd-ca.pem -ca-key=kubernetes/etcd-ca-key.pem -config=ca_config.json -profile=client - | bin/cfssljson -bare "kubernetes/{{ item }}/etcd-client"
+  args:
+    chdir: ../secret/ssl
+    creates: kubernetes/{{ item }}/etcd-client.pem
+  with_items: "{{ groups['master_nodes'] }}"
+
+# infra-etcd certificates
+- file:
+    path: ../secret/ssl/infra/{{ item }}
+    state: directory
+    mode: 0770
+  with_items: "{{ groups['all'] }}"
+
+- name: create infra etcd server certificates
+  shell: echo '{{ lookup('template', '../templates/ecdsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=infra/etcd-ca.pem -ca-key=infra/etcd-ca-key.pem -config=ca_config.json -profile=client-server -hostname="127.0.0.1,{{ hostvars[item]['ansible_host'] }}" - | bin/cfssljson -bare "infra/{{ item }}/etcd"
+  args:
+    chdir: ../secret/ssl
+    creates: infra/{{ item }}/etcd.pem
+  with_items: "{{ groups['master_nodes'] }}"
+
+- name: create infra etcd client certificates
+  shell: echo '{{ lookup('template', '../templates/ecdsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=infra/etcd-ca.pem -ca-key=infra/etcd-ca-key.pem -config=ca_config.json -profile=client - | bin/cfssljson -bare "infra/{{ item }}/etcd-client"
+  args:
+    chdir: ../secret/ssl
+    creates: infra/{{ item }}/etcd-client.pem
+  with_items: "{{ groups['all'] }}"

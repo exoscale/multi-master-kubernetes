@@ -1,0 +1,111 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry
+  namespace: kube-system
+data:
+  config.yaml: |
+    ---
+    version: 0.1
+    health:
+      storagedriver:
+        enabled: true
+        interval: 10s
+        threshold: 3
+    http:
+      addr: "0.0.0.0:5000"
+      debug:
+        addr: "0.0.0.0:5001"
+      headers:
+        X-Content-Type-Options:
+          - nosniff
+      secret: "{{ registry_secret }}"
+    log:
+      fields:
+        service: registry
+      formatter: text
+      level: info
+    storage:
+      delete:
+        enabled: true
+      maintenance:
+        uploadpurging:
+          age: 168h
+          dryrun: true
+          enabled: true
+          interval: 24h
+      s3:
+        accesskey: "{{ EXO_API_KEY }}"
+        secretkey: "{{ EXO_API_SECRET }}"
+        region: "{{ region }}"
+        regionendpoint: "{{ EXO_SOS_ENDPOINT }}"
+        bucket: "{{ bucket_name }}"
+        secure: true
+        v4auth: false
+        multipartcopythresholdsize: 5368709120
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: registry
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        k8s-app: registry
+    spec:
+      containers:
+      - name: registry
+        image: pst418/distribution:pr
+        args:
+        - serve
+        - /etc/registry/config.yaml
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+            scheme: HTTP
+        readinessProbe:
+          httpGet:
+            path: /debug/health
+            port: 5001
+            scheme: HTTP
+        ports:
+          - containerPort: 5000
+            name: http
+          - containerPort: 5001
+            name: health
+        volumeMounts:
+          - name: registry
+            readOnly: true
+            mountPath: /etc/registry
+      volumes:
+        - name: registry
+          configMap:
+            name: registry
+            items:
+            - key: config.yaml
+              path: config.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry
+  namespace: kube-system
+spec:
+  type: NodePort
+  ports:
+    - port: 5000
+      targetPort: 5000
+      nodePort: 32500
+      protocol: TCP
+  selector:
+    k8s-app: registry
