@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
       - name: kubedns
-        image: gcr.io/google_containers/kubedns-amd64:1.8
+        image: gcr.io/google_containers/kubedns-amd64:1.9
         resources:
           limits:
             memory: 200Mi
@@ -71,12 +71,20 @@ spec:
         # command = "/kube-dns"
         - --domain=cluster.local.
         - --dns-port=10053
+        - --config-map=kube-dns
+        - --v=0
+        env:
+          - name: PROMETHEUS_PORT
+            value: "10055"
         ports:
         - containerPort: 10053
           name: dns-local
           protocol: UDP
         - containerPort: 10053
           name: dns-tcp-local
+          protocol: TCP
+        - containerPort: 10055
+          name: metrics
           protocol: TCP
       - name: dnsmasq
         image: gcr.io/google_containers/kube-dnsmasq-amd64:1.4
@@ -101,14 +109,38 @@ spec:
         - containerPort: 53
           name: dns-tcp
           protocol: TCP
+      - name: dnsmasq-metrics
+        image: gcr.io/google_containers/dnsmasq-metrics-amd64:1.0
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 10054
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        args:
+        - --v=2
+        - --logtostderr
+        ports:
+        - containerPort: 10054
+          name: metrics
+          protocol: TCP
+        resources:
+          requests:
+            memory: 10Mi
       - name: healthz
         image: gcr.io/google_containers/exechealthz-amd64:1.2
         resources:
-          # keep request = limit to keep this container in guaranteed class
           limits:
             memory: 50Mi
           requests:
             cpu: 10m
+            # Note that this container shouldn't really need 50Mi of memory. The
+            # limits are set higher than expected pending investigation on #29688.
+            # The extra memory was stolen from the kubedns container to keep the
+            # net memory requested by the pod constant.
             memory: 50Mi
         args:
         - --cmd=nslookup kubernetes.default.svc.cluster.local 127.0.0.1 >/dev/null
