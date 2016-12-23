@@ -5,7 +5,6 @@ ExecStart=/usr/lib/coreos/kubelet-wrapper \
   --register-schedulable=false \
   --allow-privileged=true \
   --config=/etc/kubernetes/manifests \
-  --hostname-override={{ ansible_default_ipv4.address }} \
   --cluster-dns={{ cluster_dns }} \
   --cluster-domain=cluster.local \
   --kubeconfig=/etc/kubernetes/kube_config.yaml \
