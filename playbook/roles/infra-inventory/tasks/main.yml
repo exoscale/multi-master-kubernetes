@@ -3,7 +3,7 @@
 
 - copy:
     src: inventory
-    dest: ../secret/inventory
+    dest: /secret/inventory
   when: inventory_move_required.stat.exists
 
 - file:
@@ -14,4 +14,4 @@
 - name: write inventory file
   template:
     src: inventory.j2
-    dest: ../secret/inventory
+    dest: /secret/inventory

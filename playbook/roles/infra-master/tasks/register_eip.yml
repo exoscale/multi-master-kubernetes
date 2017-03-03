@@ -1,0 +1,14 @@
+- name: Register EIP for master nodes
+  local_action:
+    module: cs_ip_address
+    zone: CH-GVA-2
+  register: eip
+  when: "'master_nodes' not in groups or 'master_eip' not in hostvars[groups['master_nodes'][0]]"
+
+- set_fact:
+    master_eip: "{{ hostvars[groups['master_nodes'][0]]['master_eip'] }}"
+  when: "'skipped' in eip and eip['skipped']"
+
+- set_fact:
+    master_eip: "{{ eip.ip_address }}"
+  when: "'ip_address' in eip"
