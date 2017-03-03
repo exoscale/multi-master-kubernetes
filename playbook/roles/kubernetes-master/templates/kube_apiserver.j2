@@ -27,7 +27,6 @@ spec:
         - "--tls-cert-file=/etc/kubernetes/ssl/apiserver.pem"
         - "--tls-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem"
         - "--service-account-key-file=/etc/kubernetes/ssl/service-account-key.pem"
-        - "--runtime-config=extensions/v1beta1=true"
         - "--kubelet-preferred-address-types=InternalIP,ExternalIP,LegacyHostIP"
       image: "quay.io/coreos/hyperkube:{{ k8s_version }}"
       imagePullPolicy: IfNotPresent
