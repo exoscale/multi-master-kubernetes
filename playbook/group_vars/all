@@ -13,6 +13,9 @@ initial_num_worker_nodes: 3
 worker_security_group_name: "{{ cluster_name }}-worker-sg"
 worker_instance_size: Small
 
+# exoip variables
+exoip_version: "latest"
+
 # kubernetes variables
 k8s_version: "v1.5.1_coreos.0"
 k8s_etcd_version: "2.2.1"

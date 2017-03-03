@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exoip
+  namespace: kube-system
+  labels:
+    app: exoip
+spec:
+  containers:
+    -
+      name: exoip
+      image: "exoscale/exoip:{{ exoip_version }}"
+      args:
+        - -W
+      ports:
+        -
+          containerPort: 12345
+          hostPort: 12345
+          name: exoip
+      env:
+        - name: IF_ADDRESS
+          value: {{ master_eip }}
+        - name: IF_EXOSCALE_PEER_GROUP
+          value: {{ master_security_group_name }}
+        - name: IF_EXOSCALE_API_ENDPOINT
+          value: {{ EXO_API_ENDPOINT }}
+        - name: IF_EXOSCALE_API_KEY
+          value: {{ EXO_API_KEY }}
+        - name: IF_EXOSCALE_API_SECRET
+          value: {{ EXO_API_SECRET }}
+  hostNetwork: true
+  restartPolicy: Always
