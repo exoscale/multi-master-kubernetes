@@ -1,7 +1,5 @@
 - set_fact:
-     master1_ip: "{{ hostvars[groups['master_nodes'][0]]['ansible_host'] }}"
-     master2_ip: "{{ hostvars[groups['master_nodes'][1]]['ansible_host'] }}"
-     master3_ip: "{{ hostvars[groups['master_nodes'][2]]['ansible_host'] }}"
+    master_eip: "{{ hostvars[groups['master_nodes'][0]]['master_eip'] }}"
 
 - file:
     path: /etc/kubernetes/manifests

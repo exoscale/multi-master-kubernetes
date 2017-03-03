@@ -29,13 +29,3 @@ frontend ft_private_registry
 
 backend bk_private_registry
     server localhost 127.0.0.1:32500 check
-
-# local worker proxy to apiserver on all masters
-frontend ft_kube_apiserver
-    bind 127.0.0.1:8443
-    default_backend bk_kube_apiserver
-
-backend bk_kube_apiserver
-{% for item in groups['master_nodes'] %}
-    server {{ hostvars[item]['ansible_hostname'] }} {{ hostvars[item]['ansible_host'] }}:443 check
-{% endfor %}

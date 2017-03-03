@@ -1,7 +1,7 @@
 [Service]
 Environment=KUBELET_VERSION={{ k8s_version }}
 ExecStart=/usr/lib/coreos/kubelet-wrapper \
-  --api-servers=https://127.0.0.1:8443 # connect through local haproxy \
+  --api-servers=https://{{ master_eip }} \
   --register-node=true \
   --allow-privileged=true \
   --config=/etc/kubernetes/manifests \
