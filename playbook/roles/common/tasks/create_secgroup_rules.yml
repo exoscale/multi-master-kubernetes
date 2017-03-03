@@ -12,6 +12,13 @@
      security_group: "{{ master_security_group_name }}"
      start_port: 443
      end_port: 443
+  - name: master to master exoip
+    local_action:
+     module: cs_securitygroup_rule
+     security_group: "{{ master_security_group_name }}"
+     user_security_group: "{{ master_security_group_name }}"
+     start_port: 12345
+     end_port: 12345
   # infra-etcd
   - name: master to master etcd2 client ports
     local_action:
