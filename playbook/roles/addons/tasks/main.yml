@@ -1,10 +1,10 @@
 - debug:
-    msg: Wait up to 10 minutes for our cluster to initialize and come up before we can deploy addons.
+    msg: Wait up to 30 minutes for our cluster to initialize and come up before we can deploy addons.
 
 - wait_for:
     port: 443
-    host: "{{ hostvars[groups['master_nodes'][0]]['ansible_host'] }}"
-    timeout: 600
+    host: "{{ hostvars[groups['master_nodes'][0]]['master_eip'] }}"
+    timeout: 1800
 
 - name: tempfile
   shell: mktemp
