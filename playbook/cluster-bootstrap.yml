@@ -10,6 +10,13 @@
     - infra-master
     - infra-worker
     - infra-inventory
+  tasks:
+    - wait_for:
+        port: 22
+        host: "{{ hostvars[item]['ansible_host'] }}"
+        search_regex: OpenSSH
+        delay: 10
+      with_items: "{{ groups['all'] }}"
 
 # Bootstrap ansible for CoreOS
 - hosts: master_nodes, worker_nodes
