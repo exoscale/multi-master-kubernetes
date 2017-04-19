@@ -5,7 +5,7 @@
   with_items: "{{ groups['all'] }}"
 
 - name: create kubernetes apiserver certificates
-  shell: echo '{{ lookup('template', '../templates/ecdsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/apiserver-ca.pem -ca-key=kubernetes/apiserver-ca-key.pem -config=ca_config.json -profile=server -hostname="127.0.0.1,10.100.0.1,{{ hostvars[item]['ansible_host'] }}" - | bin/cfssljson -bare "kubernetes/{{ item }}/apiserver"
+  shell: echo '{{ lookup('template', '../templates/ecdsa_csr.j2', convert_data=False) }}' | bin/cfssl gencert -ca=kubernetes/apiserver-ca.pem -ca-key=kubernetes/apiserver-ca-key.pem -config=ca_config.json -profile=server -hostname="127.0.0.1,10.100.0.1,{{ hostvars[item]['ansible_host'] }},{{ hostvars[item]['master_eip'] }}" - | bin/cfssljson -bare "kubernetes/{{ item }}/apiserver"
   args:
     chdir: ../secret/ssl
     creates: kubernetes/{{ item }}/apiserver.pem

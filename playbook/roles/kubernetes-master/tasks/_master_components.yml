@@ -1,8 +1,12 @@
 # kubernetes components
 - set_fact:
+    master_eip: "{{ hostvars[groups['master_nodes'][0]]['master_eip'] }}"
     master1_ip: "{{ hostvars[groups['master_nodes'][0]]['ansible_host'] }}"
     master2_ip: "{{ hostvars[groups['master_nodes'][1]]['ansible_host'] }}"
     master3_ip: "{{ hostvars[groups['master_nodes'][2]]['ansible_host'] }}"
+    EXO_API_ENDPOINT: "{{ lookup('ini', 'endpoint section=cloudstack file=/secret/cloudstack.ini') }}"
+    EXO_API_KEY: "{{ lookup('ini', 'key section=cloudstack file=/secret/cloudstack.ini') }}"
+    EXO_API_SECRET: "{{ lookup('ini', 'secret section=cloudstack file=/secret/cloudstack.ini') }}"
 
 - template:
     src: templates/kubelet.service.j2
@@ -15,6 +19,22 @@
 - file:
     path: /etc/kubernetes/manifests
     state: directory
+    mode: 0644
+
+- template:
+    src: templates/eip.network.j2
+    dest: /etc/systemd/network/eip.network
+    owner: root
+    group: root
+    mode: 0644
+
+- command: systemctl restart systemd-networkd
+
+- template:
+    src: templates/exoip.j2
+    dest: /etc/kubernetes/manifests/exoip.yaml
+    owner: root
+    group: root
     mode: 0644
 
 - template:

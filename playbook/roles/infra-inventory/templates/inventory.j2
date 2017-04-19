@@ -3,6 +3,9 @@
 {{ name }} ansible_host={{ hostvars[name]['ansible_host'] }}
 {% endfor %}
 
+[master_nodes:vars]
+master_eip={{ master_eip }}
+
 [worker_nodes]
 {% for name in groups['worker_nodes'] %}
 {{ name }} ansible_host={{ hostvars[name]['ansible_host'] }}

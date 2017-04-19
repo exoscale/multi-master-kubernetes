@@ -1,6 +1,6 @@
 # common variables
 cluster_name: k8s
-cluster_zone: CH-DK-2
+cluster_zone: CH-GVA-2
 ssh_key: "{{ cluster_name }}-key"
 anti_affinity_group_name: "{{ cluster_name }}-aag"
 
@@ -12,6 +12,9 @@ master_instance_size: Tiny
 initial_num_worker_nodes: 3
 worker_security_group_name: "{{ cluster_name }}-worker-sg"
 worker_instance_size: Small
+
+# exoip variables
+exoip_version: "latest"
 
 # kubernetes variables
 k8s_version: "v1.5.1_coreos.0"

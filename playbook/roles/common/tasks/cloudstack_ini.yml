@@ -1,34 +1,37 @@
 - stat:
-    path: ../secret/cloudstack.ini
+    path: /secret/cloudstack.ini
   register: csini
 
-- fail: msg="test"
-  when: "csini.stat.exists and not csini.stat.isreg"
-
 - set_fact:
-    EXO_API_KEY: "{{ lookup('ini', 'key section=cloudstack file=../secret/cloudstack.ini') }}"
+    EXO_API_KEY: "{{ lookup('ini', 'key section=cloudstack file=/secret/cloudstack.ini') }}"
   when: "csini.stat.exists and csini.stat.isreg"
 
 - set_fact:
-    EXO_API_SECRET: "{{ lookup('ini', 'secret section=cloudstack file=../secret/cloudstack.ini') }}"
+    EXO_API_SECRET: "{{ lookup('ini', 'secret section=cloudstack file=/secret/cloudstack.ini') }}"
   when: "csini.stat.exists and csini.stat.isreg"
-
-- set_fact:
-    EXO_API_ENDPOINT: "{{ lookup('env', 'EXO_API_ENDPOINT') | default('https://api.exoscale.ch/compute', true) }}"
-
-- set_fact:
-    EXO_API_KEY: "{{ lookup('env', 'EXO_API_KEY') }}"
-  when: "not EXO_API_KEY"
-
-- set_fact:
-    EXO_API_SECRET: "{{ lookup('env', 'EXO_API_SECRET') }}"
-  when: "not EXO_API_SECRET"
 
 - fail:
     msg: "Please set the EXO_API_KEY and EXO_API_SECRET environment variables. You can find these on your account page. https://portal.exoscale.ch/account/profile/api"
-  when: not EXO_API_KEY and not EXO_API_SECRET
+  when: EXO_API_KEY is not defined and EXO_API_SECRET is not defined and not lookup('env', 'EXO_API_KEY') and not lookup('env', 'EXO_API_SECRET')
+
+- set_fact:
+    EXO_API_KEY: "{{ lookup('env', 'EXO_API_KEY') | default(EXO_API_KEY, true) }}"
+
+- set_fact:
+    EXO_API_SECRET: "{{ lookup('env', 'EXO_API_SECRET') | default(EXO_API_SECRET, true) }}"
+
+- set_fact:
+    EXO_API_ENDPOINT: "{{ lookup('ini', 'endpoint section=cloudstack file=/secret/cloudstack.ini') }}"
+  when: "csini.stat.exists and csini.stat.isreg"
+
+- set_fact:
+    EXO_API_ENDPOINT: 'https://api.exoscale.ch/compute'
+  when: EXO_API_ENDPOINT is not defined
+
+- set_fact:
+    EXO_API_ENDPOINT: "{{ lookup('env', 'EXO_API_ENDPOINT') | default(EXO_API_ENDPOINT, true) }}"
 
 - name: write cloudstack.ini
   template:
     src: cloudstack_ini.j2
-    dest: ../secret/cloudstack.ini
+    dest: /secret/cloudstack.ini

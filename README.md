@@ -129,13 +129,3 @@ configured to communicate via TLS using certificates.
 
 The required certificate authorities and certificates are generated using cfssl
 automatically.
-
-## Known issues / limitations
-
-### Kubectl
-
-kubectl is configured to talk to the first master node via IP. If the first
-master node is unavailable, you need to update your kubectl config to talk
-to another master node or bring the master node back up.
-You can of course setup DNS A records for each one of your nodes and use
-a DNS name instead of the IP in your config.
