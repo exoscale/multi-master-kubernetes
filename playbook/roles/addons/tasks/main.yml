@@ -53,5 +53,5 @@
     src: templates/registry.j2
     dest: "{{ tempfile.stdout }}"
 
-- name: kubectl apply nginx-ingress
+- name: kubectl apply registry
   shell: kubectl --kubeconfig=/secret/kubeconfig apply -f "{{ tempfile.stdout }}"
