@@ -62,3 +62,8 @@ coreos:
                         [Unit]
                         Requires=flanneld.service
                         After=flanneld.service
+                -
+                    name: 20-docker-opts.conf
+                    content: |
+                        [Service]
+                        Environment="DOCKER_OPTS=--log-opt max-size=50m --log-opt max-file=3"
