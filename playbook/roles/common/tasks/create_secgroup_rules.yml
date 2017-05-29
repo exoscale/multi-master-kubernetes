@@ -17,6 +17,7 @@
      module: cs_securitygroup_rule
      security_group: "{{ master_security_group_name }}"
      user_security_group: "{{ master_security_group_name }}"
+     protocol: udp
      start_port: 12345
      end_port: 12345
   # infra-etcd
