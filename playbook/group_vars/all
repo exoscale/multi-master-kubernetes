@@ -17,7 +17,7 @@ worker_instance_size: Small
 exoip_version: "latest"
 
 # kubernetes variables
-k8s_version: "v1.5.1_coreos.0"
+k8s_version: "v1.6.4_coreos.0"
 k8s_etcd_version: "2.2.1"
 cluster_dns: "10.100.0.10"
 service_cluster_ip_range: "10.100.0.0/16"
