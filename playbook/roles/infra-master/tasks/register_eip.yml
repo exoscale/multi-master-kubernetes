@@ -1,7 +1,7 @@
 - name: Register EIP for master nodes
   local_action:
     module: cs_ip_address
-    zone: CH-GVA-2
+    zone: "{{ cluster_zone }}"
   register: eip
   when: "'master_nodes' not in groups or 'master_eip' not in hostvars[groups['master_nodes'][0]]"
 
