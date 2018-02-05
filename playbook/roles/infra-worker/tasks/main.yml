@@ -1,2 +1,2 @@
 ---
-  - include: create_nodes.yml
+  - import_tasks: create_nodes.yml

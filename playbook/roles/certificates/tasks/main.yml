@@ -1,4 +1,4 @@
 ---
-  - include: _setup.yml
-  - include: _generate_cas.yml
-  - include: _generate_certificates.yml
+  - import_tasks: _setup.yml
+  - import_tasks: _generate_cas.yml
+  - import_tasks: _generate_certificates.yml

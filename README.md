@@ -16,8 +16,11 @@ https://portal.exoscale.ch/account/profile/api
 Let's bootstrap a cluster.
 
 ```
+# Optionally build the docker image
+docker build -t exoscale/multi-master-kubernetes .
+
 # Run the container and mount a data volume for the cluster specific secrets
-docker run -ti -v k8s_secrets:/secret exoscale/multi-master-kubernetes
+docker run -it -v k8s_secrets:/secret exoscale/multi-master-kubernetes
 
 # Set EXO_API_KEY and EXO_API_SECRET environment variables
 export EXO_API_KEY=

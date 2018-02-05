@@ -1,5 +1,5 @@
 ---
-  - include: cloudstack_ini.yml
-  - include: create_sshkey.yml
-  - include: create_secgroups.yml
-  - include: create_secgroup_rules.yml
+  - import_tasks: cloudstack_ini.yml
+  - import_tasks: create_sshkey.yml
+  - import_tasks: create_secgroups.yml
+  - import_tasks: create_secgroup_rules.yml

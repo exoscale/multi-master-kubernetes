@@ -11,7 +11,7 @@
     local_action:
       module: cs_instance
       display_name: "{{ item }}"
-      template: "Linux CoreOS stable 1298 64-bit 50G Disk (2017-04-01-5bcb70)"
+      template: "Linux CoreOS 1576 64-bit 50G Disk (2018-01-05-8856b8)"
       service_offering: "{{ worker_instance_size }}"
       ssh_key: "{{ ssh_key }}"
       security_groups: [ '{{ worker_security_group_name }}' ]
@@ -19,7 +19,7 @@
       zone: "{{ cluster_zone }}"
     with_items: "{{ worker_hostnames }}"
     register: created_worker_nodes
-    when: "'worker_nodes' not in groups or groups['worker_nodes']|length < {{ desired_num_worker_nodes }}"
+    when: "'worker_nodes' not in groups or groups['worker_nodes'] | length < desired_num_worker_nodes"
 
   - add_host:
       groups: worker_nodes
@@ -29,4 +29,4 @@
       ansible_ssh_private_key_file: "../secret/id_rsa_{{ ssh_key }}"
       ansible_python_interpreter: /home/core/bin/python
     with_items: "{{ created_worker_nodes.results }}"
-    when: "'worker_nodes' not in groups or groups['worker_nodes']|length < {{ desired_num_worker_nodes }}"
+    when: "'worker_nodes' not in groups or groups['worker_nodes'] | length < desired_num_worker_nodes"
