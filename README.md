@@ -2,7 +2,7 @@
 
 This Ansible playbook helps you setup a multi-master
 [Kubernetes](http://kubernetes.io/) cluster on
-[Exoscale](https://www.exoscale.ch/).
+[Exoscale](https://www.exoscale.com/).
 
 ## Getting started
 
