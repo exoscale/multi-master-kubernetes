@@ -11,7 +11,7 @@
   when: "csini.stat.exists and csini.stat.isreg"
 
 - fail:
-    msg: "Please set the EXO_API_KEY and EXO_API_SECRET environment variables. You can find these on your account page. https://portal.exoscale.ch/account/profile/api"
+    msg: "Please set the EXO_API_KEY and EXO_API_SECRET environment variables. You can find these on your account page. https://portal.exoscale.com/account/profile/api"
   when: EXO_API_KEY is not defined and EXO_API_SECRET is not defined and not lookup('env', 'EXO_API_KEY') and not lookup('env', 'EXO_API_SECRET')
 
 - set_fact:
