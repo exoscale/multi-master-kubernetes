@@ -11,7 +11,7 @@ of containers and volumes is required. You also need a Exoscale account and
 the corresponding API key and secret.
 
 You can get your key and secret here:
-https://portal.exoscale.ch/account/profile/api
+https://portal.exoscale.com/account/profile/api
 
 Let's bootstrap a cluster.
 
