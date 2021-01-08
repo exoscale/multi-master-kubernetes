@@ -1,3 +1,12 @@
+# DEPRECATED
+
+Please look at other deployment options for production ready Kubernetes
+clusters on Exoscale
+
+* [Cluster API](https://cluster-api.sigs.k8s.io/reference/providers.html)
+* Native managed kubernetes from Exoscale
+* Rancher and other control panels
+
 # Multi-master Kubernetes
 
 This Ansible playbook helps you setup a multi-master
